@@ -130,55 +130,6 @@ foreach my $chunk (@chunks) {
 #################################################################################
 #################################################################################
 
-sub count_git_header_lines {
-	my @lines = @_;
-	my $ret   = 0;
-
-	# If we're not in --patch mode then bail out early
-	if (!$args->{patch} && !$ENV{DSF_PATCH_MODE}) {
-		return 0;
-	}
-
-	# Textual diff should be four lines of header
-	#diff --git a/diff-so-fancy b/diff-so-fancy
-	#index d952098..424d8a3 100755
-	#--- a/diff-so-fancy
-	#+++ b/diff-so-fancy
-
-	# Binary diff should be three lines of header
-	#diff --git a/file.txt b/file.txt
-	#new file mode 100644
-	#index 0000000..e69de29
-
-	#diff --git a/hello.txt b/hello.txt
-	#new file mode 100644
-	#index 0000000..0c767bc
-	#--- /dev/null
-	#+++ b/hello.txt
-
-	my $count = 1;
-	foreach my $line (@lines) {
-		if ($line =~ /^${ansi_color_regex}index/) {
-			last;
-		}
-
-		$count++;
-	}
-
-	if ($count == 2) {
-		$count = 4;
-	}
-
-	$ret = $count;
-
-	# No Git/Diff header should be more than four lines
-	if ($ret > 4) {
-		$ret = 0;
-	}
-
-	return $ret;
-}
-
 sub do_dsf_stuff {
 	my $input = shift();
 
@@ -1249,6 +1200,56 @@ sub log_chunks {
 	debug_log("-------------- Chunk --------------");
 	debug_log(@$line_ref);
 }
+
+sub count_git_header_lines {
+	my @lines = @_;
+	my $ret   = 0;
+
+	# If we're not in --patch mode then bail out early
+	if (!$args->{patch} && !$ENV{DSF_PATCH_MODE}) {
+		return 0;
+	}
+
+	# Textual diff should be four lines of header
+	#diff --git a/diff-so-fancy b/diff-so-fancy
+	#index d952098..424d8a3 100755
+	#--- a/diff-so-fancy
+	#+++ b/diff-so-fancy
+
+	# Binary diff should be three lines of header
+	#diff --git a/file.txt b/file.txt
+	#new file mode 100644
+	#index 0000000..e69de29
+
+	#diff --git a/hello.txt b/hello.txt
+	#new file mode 100644
+	#index 0000000..0c767bc
+	#--- /dev/null
+	#+++ b/hello.txt
+
+	my $count = 1;
+	foreach my $line (@lines) {
+		if ($line =~ /^${ansi_color_regex}index/) {
+			last;
+		}
+
+		$count++;
+	}
+
+	if ($count == 2) {
+		$count = 4;
+	}
+
+	$ret = $count;
+
+	# No Git/Diff header should be more than four lines
+	if ($ret > 4) {
+		$ret = 0;
+	}
+
+	return $ret;
+}
+
 
 # Borrowed from: https://www.perturb.org/display/1097_Perl_detect_if_a_module_is_installed_before_using_it.html
 # Creates methods k() and kd() to print, and print & die respectively
