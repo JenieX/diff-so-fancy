@@ -378,16 +378,21 @@ sub do_dsf_stuff {
 			}
 
 			my $next    = shift(@$input);
-			my ($file1) = $next =~ /rename from (.+?)(\e|\t|$)/;
+			my ($action1, $file1) = $next =~ /(copy|rename) from (.+?)(\e|\t|$)/;
 
 			$next       = shift(@$input);
-			my ($file2) = $next =~ /rename to (.+?)(\e|\t|$)/;
+			my ($action2, $file2) = $next =~ /(copy|rename) to (.+?)(\e|\t|$)/;
 
 			if ($file1 && $file2) {
 				# We may not have extracted this yet, so we pull from the config if not
 				$meta_color = get_config_color("meta");
 
-				my $change = file_change_string($file1,$file2);
+				my $change = "???";
+				if ($action1 eq "copy") {
+					$change = "Copied $file1 to $file2";
+				} else {
+					$change = file_change_string($file1,$file2);
+				}
 
 				print horizontal_rule($meta_color);
 				print $meta_color . $change . "\n";
