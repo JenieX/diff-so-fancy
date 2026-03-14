@@ -143,6 +143,11 @@ sub count_git_header_lines {
 	my @lines = @_;
 	my $ret   = 0;
 
+	# If we're not in --patch mode then bail out early
+	if (!$args->{patch} && !$ENV{DSF_PATCH_MODE}) {
+		return 0;
+	}
+
 	# Textual diff should be four lines of header
 	#diff --git a/diff-so-fancy b/diff-so-fancy
 	#index d952098..424d8a3 100755
@@ -189,10 +194,10 @@ sub do_dsf_stuff {
 	# If we're in debug mode we want to log the chunks we see
 	if ($args->{debug}) { log_chunks($input); }
 
+	# FIXME: There is a scenario where there are FIVE diff header lines
+	# I'm not sure if we need to account for that or not. Unit tests pass so... bees?
 	my $cnt = count_git_header_lines(@$input);
-	if ($cnt == 3) {
-		$patch_mode = 0;
-	} elsif ($cnt == 4) {
+	if ($cnt == 4) {
 		$patch_mode = 1;
 	}
 
