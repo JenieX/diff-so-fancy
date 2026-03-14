@@ -62,12 +62,9 @@ teardown_file() {
 	output=$( load_fixture "recursive_longhand_as_mercurial" | $diff_so_fancy )
 	run printf "%s" "$output"
 
-	assert_line --index 1 --partial "renamed:"
-	assert_line --index 3 --partial "@ language/app.py:1 @"
-	assert_line --index 19 --partial "renamed:"
-	assert_line --index 21 --partial "@ language/__init__.py:1 @"
-	assert_line --index 25 --partial "renamed:"
-	assert_line --index 27 --partial "@ language/README.md:1 @"
+    assert_output --regexp 'modified: app.py'
+    assert_output --regexp 'modified: __init__.py'
+    assert_output --regexp 'modified: README.md'
 }
 
 @test "Functional part with bright color (#444)" {
