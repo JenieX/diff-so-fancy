@@ -1119,6 +1119,8 @@ sub debug_log {
 	return 1;
 }
 
+# Find the commom prefix chars between two strings
+# common_prefix("foobar", "food is yummy"); # 'foo'
 sub common_prefix {
 	my ($a, $b) = @_;
 	my $len = length($a) < length($b) ? length($a) : length($b);
@@ -1195,6 +1197,7 @@ sub get_diff_chunks {
 	return @ret;
 }
 
+# Log each chunk of diff for debugging purposes
 sub log_chunks {
 	my $line_ref = shift();
 
@@ -1202,6 +1205,8 @@ sub log_chunks {
 	debug_log(@$line_ref);
 }
 
+# In patch mode we have to keep the line ratio 1:1 so we need to know how many
+# header lines there are. Usually three or four.
 sub count_git_header_lines {
 	my @lines = @_;
 	my $ret   = 0;
