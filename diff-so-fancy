@@ -94,8 +94,6 @@ my @lines;
 local $DiffHighlight::line_cb = sub {
 	push(@lines,@_);
 
-	my $last_line = $lines[-1];
-
 	# Wait until we have enough lines to process, then divide up into safe
 	# parseable chunks and have d-s-f do it's magic
 	if (@lines > 100) {
