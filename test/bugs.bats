@@ -81,3 +81,9 @@ teardown_file() {
   run printf "%s" "$output"
   assert_line --index 5 --partial  "History"
 }
+
+@test "File copy detection" {
+  output=$( load_fixture "file_copy" | $diff_so_fancy )
+  run printf "%s" "$output"
+  assert_output --regexp 'Copied first_file to copied_file'
+}
