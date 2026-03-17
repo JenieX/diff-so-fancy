@@ -91,3 +91,12 @@ teardown_file() {
   assert_output --regexp 'modified: foo/bar'
   assert_output --regexp 'modified: index.txt'
 }
+
+@test "Remove a \n at the end of a file (#474)" {
+  output=$( load_fixture "remove_slashn_eof" | $diff_so_fancy )
+  echo $output
+  run printf "%s" "$output"
+  #assert_output --regexp 'one'
+  assert_line --index 6 --regexp "three"
+  assert_line --index 7 --regexp "three"
+}
