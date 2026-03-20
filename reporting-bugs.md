@@ -6,7 +6,7 @@ If you find a bug using the following command
 git diff HEAD..HEAD^
 ```
 
-You can use [report-bug.sh](./report-bug.sh) we provide
+You can use [report-bug.sh](third_party/report_bug/report-bug.sh) we provide
 
 ```sh
 ./report-bug.sh 'git diff HEAD..HEAD^'
