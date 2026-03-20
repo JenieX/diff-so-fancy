@@ -61,7 +61,7 @@ git config --bool --global diff-so-fancy.changeHunkIndicators false
 
 ### stripLeadingSymbols
 
-Should the `+` or `-` symbols at line-start be removed. (Default: true)
+Remove the `+` or `-` symbols at start of each diff line. (Default: true)
 
 ```shell
 git config --bool --global diff-so-fancy.stripLeadingSymbols false
@@ -69,9 +69,8 @@ git config --bool --global diff-so-fancy.stripLeadingSymbols false
 
 ### useUnicodeRuler
 
-By default, the separator for the file header uses Unicode line-drawing characters.
-If this is causing output errors on your terminal, set this to `false` to use
-ASCII characters instead. (Default: true)
+Use Unicode to draw the ruler lines. Setting this to false will use ASCII
+instead. (Default: true)
 
 ```shell
 git config --bool --global diff-so-fancy.useUnicodeRuler false
@@ -79,8 +78,7 @@ git config --bool --global diff-so-fancy.useUnicodeRuler false
 
 ### rulerWidth
 
-By default, the separator for the file header spans the full width of the terminal.
-Use rulerWidth to set the width of the file header manually.
+rulerWidth sets the width of the ruler lines. (Default: screen width)
 
 ```shell
 git config --global diff-so-fancy.rulerWidth 80
