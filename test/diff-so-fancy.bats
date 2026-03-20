@@ -249,3 +249,10 @@ teardown_file() {
 	assert_line --index 1 --partial "modified: doc/manual.xml.head"
 	assert_line --index 3 --partial "@ doc/manual.xml.head:8355 @"
 }
+
+@test "Short headers" {
+	# stderr forced into output
+	output=$( load_fixture "single-line-remove" | $diff_so_fancy --shortHeaders 1)
+	run printf "%s" "$output"
+	assert_line --index 1 --regexp 'deleted: .*@ 1'
+}
