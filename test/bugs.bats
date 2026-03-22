@@ -100,3 +100,9 @@ teardown_file() {
   assert_line --index 6 --regexp "three"
   assert_line --index 7 --regexp "three"
 }
+
+@test "Single line input passes through d-s-f (#511)" {
+  output=$( load_fixture "oneline" | $diff_so_fancy )
+  run printf "%s" "$output"
+  assert_line --index 0 --regexp "one line"
+}
