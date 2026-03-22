@@ -129,6 +129,7 @@ DiffHighlight::flush();
 
 # Process anything left over
 my @chunks = get_diff_chunks(\@lines);
+
 foreach my $chunk (@chunks) {
 	do_dsf_stuff($chunk);
 }
@@ -1201,7 +1202,7 @@ sub get_diff_chunks {
 
 	# The final end point is the last line
 	my $last_idx = $end_lines[-1] || 0;
-	if ($last_idx != ($total_lines - 1)) {
+	if (($last_idx == 0) || ($last_idx != ($total_lines - 1))) {
 		push(@end_lines, $total_lines - 1);
 	}
 
@@ -1210,12 +1211,10 @@ sub get_diff_chunks {
 	my @ret  = ();
 	my $prev = 0;
 	foreach my $idx (@end_lines) {
-		if ($idx > 0) {
-			# Array splice the lines into a smaller chuck and put them in @ret
-			my @tmp = @lines[$prev .. $idx];
-			push(@ret, \@tmp);
-			$prev = $idx + 1;
-		}
+		# Array splice the lines into a smaller chuck and put them in @ret
+		my @tmp = @lines[$prev .. $idx];
+		push(@ret, \@tmp);
+		$prev = $idx + 1;
 	}
 
 	return @ret;
