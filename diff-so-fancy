@@ -1190,14 +1190,27 @@ sub get_diff_chunks {
 	my @lines       = @$line_ref;
 	my @end_lines   = (); # Array of line numbers of the END of each chunk
 	my $total_lines = scalar(@lines);
+	my $prev        = "";
 
 	# Loop through all the lines and build end line numbers for each "chunk"
 	for (my $i = 0; $i < $total_lines; $i++) {
-		my $line = $lines[$i];
+		my $line           = $lines[$i];
+		my $is_header_line = $line =~ m/^${ansi_color_regex}(diff|index|Submodule|---|\+\+\+|@@?)\s/;
 
-		if (($i > 0) && $line =~ /^${ansi_color_regex}diff/) {
+		#if ($is_header_line) {
+		#    printf("H%02d: %s", $i, $line);
+		#} else {
+		#    printf("N%02d: %s", $i, $line);
+		#}
+
+		# If this line is a header, and the previous line was NOT that means
+		# the previous line was the prev line of this chunk
+		if (($i > 0) && ($is_header_line && !$prev)) {
+			# It's a transition point
 			push(@end_lines, $i - 1);
 		}
+
+		$prev = $is_header_line;
 	}
 
 	# The final end point is the last line
@@ -1208,8 +1221,8 @@ sub get_diff_chunks {
 
 	# Now that we know where all the end points are we divide the big array
 	# into smaller chunks
-	my @ret  = ();
-	my $prev = 0;
+	my @ret = ();
+	$prev   = 0;
 	foreach my $idx (@end_lines) {
 		# Array splice the lines into a smaller chuck and put them in @ret
 		my @tmp = @lines[$prev .. $idx];
