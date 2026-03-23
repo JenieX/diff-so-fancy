@@ -6,7 +6,7 @@
 
 Vanilla `git diff` vs `git` and `diff-so-fancy`
 
-![diff-highlight vs diff-so-fancy](diff-so-fancy.png)
+![diff-highlight vs diff-so-fancy](docs/diff-so-fancy.png)
 
 ## 📦 Install
 
