@@ -138,7 +138,8 @@ foreach my $chunk (@chunks) {
 #################################################################################
 
 sub do_dsf_stuff {
-	my $input = shift();
+	my $input     = shift();
+	my $chunk_str = join("", @$input); # Store the full chunk text for lookbacks
 
 	# If we're in debug mode we want to log the chunks we see
 	if ($args->{debug}) { log_chunks($input); }
