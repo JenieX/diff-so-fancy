@@ -22,13 +22,11 @@ teardown_file() {
 
 # https://github.com/paulirish/dotfiles/commit/6743b907ff586c28cd36e08d1e1c634e2968893e#commitcomment-13459061
 @test "All removed lines are present in diff" {
-  output=$( load_fixture "chromium-modaltoelement" | $diff_so_fancy )
+	output=$( load_fixture "chromium-modaltoelement" | $diff_so_fancy | $ansi_reveal)
 	run printf "%s" "$output"
 
-  assert_line --index 7 --partial "WebInspector.Dialog"
-  assert_line --index 7 --partial "5;52m" # red oldhighlight
-  assert_line --index 8 --partial "WebInspector.Dialog"
-  assert_line --index 8 --partial "5;22m" # green newhighlight
+	assert_line --index 7 --partial "[BOLD][RED]WebInspector.Dialog"
+	assert_line --index 8 --partial "[BOLD][GREEN]WebInspector.Dialog"
 }
 
 @test "File with space in the name (#360)" {
@@ -39,11 +37,11 @@ teardown_file() {
 }
 
 @test "Vanilla diff with add/remove empty lines (#366)" {
-	output=$( load_fixture "add_remove_empty_lines" | $diff_so_fancy )
+	output=$( load_fixture "add_remove_empty_lines" | $diff_so_fancy | $ansi_reveal )
 	run printf "%s" "$output"
 
-	assert_line --index 5 --partial  "5;22m" # green added line
-	assert_line --index 8 --partial  "5;52m" # red removed line
+	assert_line --index 5 --partial "[REVERSE][BOLD][GREEN][BACKG022] [RESET]" # green added line
+	assert_line --index 8 --partial "[REVERSE][BOLD][RED][BACKG052] [RESET]" # red removed line
 }
 
 @test "recursive vanilla diff -r -bu as Mercurial (#436)" {
@@ -62,45 +60,47 @@ teardown_file() {
 	output=$( load_fixture "recursive_longhand_as_mercurial" | $diff_so_fancy )
 	run printf "%s" "$output"
 
-    assert_output --regexp 'modified: app.py'
-    assert_output --regexp 'modified: __init__.py'
-    assert_output --regexp 'modified: README.md'
+	assert_output --regexp 'modified: app.py'
+	assert_output --regexp 'modified: __init__.py'
+	assert_output --regexp 'modified: README.md'
 }
 
 @test "Functional part with bright color (#444)" {
-  output=$( load_fixture "move_with_content_change" | $diff_so_fancy )
-  run printf "%s" "$output"
-  assert_line --index 3 --partial  "@[0m[93m height"
+	output=$( load_fixture "move_with_content_change" | $diff_so_fancy | $ansi_reveal )
+	run printf "%s" "$output"
+	assert_line --index 3 --partial  "[BRT-YELLW] height:"
+	assert_line --index 8 --partial  "[BOLD][GREEN]bottom: '0'"
+	assert_line --index 7 --partial  "[BOLD][RED]bottom: '0'"
 }
 
 @test "ANSI Reset without the zero (#469)" {
-  output=$( load_fixture "ansi_reset_no_number" | $diff_so_fancy )
-  run printf "%s" "$output"
-  assert_line --index 5 --partial  "History"
+	output=$( load_fixture "ansi_reset_no_number" | $diff_so_fancy )
+	run printf "%s" "$output"
+	assert_line --index 5 --partial  "History"
 }
 
 @test "File copy detection (#349)" {
-  output=$( load_fixture "file_copy" | $diff_so_fancy )
-  run printf "%s" "$output"
-  assert_output --regexp 'Copied first_file to copied_file'
+	output=$( load_fixture "file_copy" | $diff_so_fancy )
+	run printf "%s" "$output"
+	assert_output --regexp 'Copied first_file to copied_file'
 }
 
 @test "diff --recursive support (#394)" {
-  output=$( load_fixture "diff_recursive" | $diff_so_fancy )
-  run printf "%s" "$output"
-  assert_output --regexp 'modified: foo/bar'
-  assert_output --regexp 'modified: index.txt'
+	output=$( load_fixture "diff_recursive" | $diff_so_fancy )
+	run printf "%s" "$output"
+	assert_output --regexp 'modified: foo/bar'
+	assert_output --regexp 'modified: index.txt'
 }
 
 @test "Remove a \n at the end of a file (#474)" {
-  output=$( load_fixture "remove_slashn_eof" | $diff_so_fancy | $ansi_reveal)
-  run printf "%s" "$output"
-  assert_line --index 6 --partial "[BOLD][RED]three[RESET]"
-  assert_line --index 7 --partial "[BOLD][GREEN]three[RESET]"
+	output=$( load_fixture "remove_slashn_eof" | $diff_so_fancy | $ansi_reveal)
+	run printf "%s" "$output"
+	assert_line --index 6 --partial "[BOLD][RED]three[RESET]"
+	assert_line --index 7 --partial "[BOLD][GREEN]three[RESET]"
 }
 
 @test "Single line input passes through d-s-f (#511)" {
-  output=$( load_fixture "oneline" | $diff_so_fancy )
-  run printf "%s" "$output"
-  assert_line --index 0 --regexp "one line"
+	output=$( load_fixture "oneline" | $diff_so_fancy )
+	run printf "%s" "$output"
+	assert_line --index 0 --regexp "one line"
 }
