@@ -297,7 +297,7 @@ sub do_dsf_stuff {
 
 			if ($short_headers) {
 				my $start_line = extract_start_line($line, $input, $context_lines);
-				print file_change_string($file_1,$file_2) . " \@ $start_line${reset_color}\n";
+				print file_change_string($file_1,$file_2) . " ${reset_color}${meta_color}\@ $start_line${reset_color}\n";
 			} else {
 				print file_change_string($file_1,$file_2) . "\n";
 			}
