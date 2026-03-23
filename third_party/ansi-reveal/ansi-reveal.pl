@@ -4,9 +4,11 @@ use strict;
 use warnings;
 use Getopt::Long;
 
-my $raw = 0;
+my $raw   = 0;
+my $plain = $ENV{AR_PLAIN} || 0;
 GetOptions(
-	'raw' => \$raw,
+	'raw'   => \$raw,
+	'plain' => \$plain,
 );
 
 if ($raw) {
@@ -22,6 +24,10 @@ sub output_human {
 
 	while (my $l = <>) {
 		$l =~ s/(\e\[.*?m)/dump_ansi($1)/eg;
+
+		if ($plain) {
+			$l = bleach_text($l);
+		}
 
 		print $l;
 	}
@@ -103,6 +109,14 @@ sub dump_ansi {
 	$ret .= $raw;
 
 	return $ret;
+}
+
+# Remove all ANSI codes from a string
+sub bleach_text {
+	my $str = shift();
+	$str    =~ s/\e\[\d*(;\d+)*m//mg;
+
+	return $str;
 }
 
 BEGIN {
