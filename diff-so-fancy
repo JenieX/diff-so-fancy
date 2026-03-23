@@ -154,6 +154,7 @@ sub do_dsf_stuff {
 
 	# Calculate the context lines for this chunk
 	my $context_lines = calculate_context_lines(@$input);
+	my $git_show_mode = 0;
 
 	#print STDERR "START -------------------------------------------------\n";
 	#print STDERR join("",@$input);
@@ -235,6 +236,13 @@ sub do_dsf_stuff {
 				# we are consuming one line, and the debt must be paid
 				print "\n";
 			}
+		} elsif ($line =~ /^${ansi_color_regex}commit/) {
+			$meta_color    = $1;
+			$git_show_mode = 1;
+
+			print horizontal_rule($meta_color);
+			print "$line";
+			print horizontal_rule($meta_color);
 		########################################
 		# Find the first file: --- a/README.md #
 		########################################

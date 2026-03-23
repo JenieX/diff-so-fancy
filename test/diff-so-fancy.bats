@@ -123,13 +123,13 @@ teardown_file() {
 @test "Empty file add" {
 	output=$( load_fixture "add_empty_file" | $diff_so_fancy )
 	run printf "%s" "$output"
-	assert_line --index 5 --regexp "added:.*empty_file.txt"
+	assert_line --index 7 --regexp "added:.*empty_file.txt"
 }
 
 @test "Empty file delete" {
 	output=$( load_fixture "remove_empty_file" | $diff_so_fancy )
 	run printf "%s" "$output"
-	assert_line --index 5 --regexp "deleted:.*empty_file.txt"
+	assert_line --index 7 --regexp "deleted:.*empty_file.txt"
 }
 
 @test "Move with content change" {
@@ -191,8 +191,8 @@ teardown_file() {
 	output=$( load_fixture "file-moves" | $diff_so_fancy )
 	run printf "%s" "$output"
 
-	assert_line --index 46 --partial "@ package.json:1 @"
-	assert_line --index 79 --partial "@ square.yml:1 @"
+	assert_line --index 48 --partial "@ package.json:1 @"
+	assert_line --index 81 --partial "@ square.yml:1 @"
 }
 
 @test "Reworked hunks (noprefix)" {
