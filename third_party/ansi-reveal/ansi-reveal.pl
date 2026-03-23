@@ -99,7 +99,18 @@ sub dump_ansi {
 			my $color = $p - 30;
 			$color = $basic_mapping[$color];
 			$ret .= "[$color]";
-			#$ret .= sprintf("[BASIC%03d]",$color);
+		} elsif ($p >= 40 and $p <= 47) {
+			my $color = $p - 40;
+			$color = $basic_mapping[$color];
+			$ret .= "[BG-$color]";
+		} elsif ($p >= 90 and $p <= 97) {
+			my $color = $p - 90;
+			$color = $basic_mapping[$color];
+			$ret .= "[BRT-$color]";
+		} elsif ($p >= 100 and $p <= 107) {
+			my $color = $p - 100;
+			$color = $basic_mapping[$color];
+			$ret .= "[BRTBG-$color]";
 		} else {
 			$ret .= "[UKN: $p]";
 		}
