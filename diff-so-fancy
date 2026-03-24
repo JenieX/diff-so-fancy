@@ -1170,13 +1170,13 @@ sub get_diff_chunks {
 	my @lines       = @$line_ref;
 	my @end_lines   = (); # Array of line numbers of the END of each chunk
 	my $total_lines = scalar(@lines);
-	my $prev        = "";
+	my $prev        = 0;
 
 	# Loop through all the lines and build end line numbers for each "chunk"
 	for (my $i = 0; $i < $total_lines; $i++) {
 		my $line           = $lines[$i];
 		my $is_header_line = $line =~ m/^${ansi_color_regex}(diff|index|Submodule|---|\+\+\+|@@?|new|deleted|old)\s/;
-		#my $is_header_line = $line =~ m/^${ansi_color_regex}(diff|index|Submodule|---|\+\+\+|@@?)\s/;
+		$is_header_line    = int($is_header_line);
 
 		#if ($is_header_line) {
 		#    printf("H%02d: %s", $i, $line);
