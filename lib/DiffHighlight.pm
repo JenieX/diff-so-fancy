@@ -145,7 +145,7 @@ sub color_config {
 	}
 
 	my $s = $cached_config->{$key};
-	return length($s) ? $s : $default;
+	return defined($s) ? $s : $default;
 }
 
 sub show_hunk {
