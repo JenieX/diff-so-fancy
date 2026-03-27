@@ -4,11 +4,9 @@ use strict;
 use warnings;
 use Getopt::Long;
 
-my $raw   = 0;
-my $plain = $ENV{AR_PLAIN} || 0;
+my $raw = 0;
 GetOptions(
-	'raw'   => \$raw,
-	'plain' => \$plain,
+	'raw' => \$raw,
 );
 
 if ($raw) {
@@ -25,9 +23,32 @@ sub output_human {
 	while (my $l = <>) {
 		$l =~ s/(\e\[.*?m)/dump_ansi($1)/eg;
 
-		if ($plain) {
-			$l = bleach_text($l);
-		}
+		## Basic reset
+		#$l =~ s/(\e\[0?m)/${reset}[RESET]/g;
+
+		## Bold text
+		#$l =~ s/(\e\[1m)/${reset}[BOLD]/g;
+
+		## Inverted text
+		#$l =~ s/(\e\[7m)/${reset}. "[INVRT]$1"/eg;
+		#$l =~ s/(\e\[7;(\d+)m)/${reset}. "[INVRT" . sprintf("%03d",($2-30)) . "]$1"/eg;
+
+		## Basic 16 color ANSI
+		##$l =~ s/(\e\[(3[0-7])m)/${reset}. "[BASIC" . sprintf("%03d",($2-30)) . "]$1"/eg;
+		#$l =~ s/(\e\[(3[0-7])m)/dump_ansi($1)/eg;
+		##$l =~ s/(\e\[1;(3[0-7])m)/${reset}. "[BRIGH" . sprintf("%03d",($2-30)) . "]$1"/eg;
+		#$l =~ s/(\e\[1;(3[0-7])m)/dump_ansi($1)/eg;
+
+		## 256 Color/Background
+		#$l =~ s/(\e\[38;0?5;(\d+)m)/${reset}. "[COLOR" . sprintf("%03d",$2) . "]$1"/eg;
+		#$l =~ s/(\e\[48;0?5;(\d+)m)/${reset}. "[BACKG" . sprintf("%03d",$2) . "]$1"/eg;
+
+		#$l =~ s/(\e\[1;(3[0-7]);48;5;(\d+)m)/${reset}. "[FGBG" . sprintf("%02d:%02d",($2-30),($3)) . "]$1"/eg;
+		#$l =~ s/(\e\[1;38;5;(.*?)m)/${reset} . dump_ansi($1) . "$1"/eg;
+
+		## 24bit Color/Background
+		#$l =~ s/(\e\[38;2;(\d+);(\d+);(\d+)m)/${reset} . sprintf("[RGB#%02X%02X%02X",$2,$3,$4) . "]$1"/eg;
+		#$l =~ s/(\e\[48;2;(\d+);(\d+);(\d+)m)/${reset} . sprintf("[RGBBG#%02X%02X%02X",$2,$3,$4) . "]$1"/eg;
 
 		print $l;
 	}
@@ -81,64 +102,25 @@ sub dump_ansi {
 			$ret .= "[REVERSE]";
 		} elsif ($p eq "27") {
 			$ret .= "[NOTREV]";
-		# Foreground color
-		} elsif ($p eq "38") { # Foreground either 8 or 24bit
-			my $next  = $parts[$count + 1]; # 5 = 8bit, 2 = 24bit
+		} elsif ($p eq "38") {
+			my $next  = $parts[$count + 1];
+			my $color = $parts[$count + 2];
 
-			if ($next == 5) {
-				my $color  = $parts[$count + 2];
-				$count    += 2;
+			$count += 2;
 
-				$ret .= sprintf("[COLOR%03d]",$color);
-			} elsif ($next == 2) {
-				my $red    = $parts[$count + 2];
-				my $green  = $parts[$count + 3];
-				my $blue   = $parts[$count + 4];
-				$count    += 4;
+			$ret .= sprintf("[COLOR%03d]",$color);
+		} elsif ($p eq "48") {
+			my $next  = $parts[++$count];
+			my $color = $parts[++$count];
 
-				$ret .= sprintf("[COLOR(%d,%d,%d)]", $red, $green, $blue);
-			} else {
-				$ret .= sprintf("[COLOR???]");
-			}
-		# Background color
-		} elsif ($p eq "48") { # Background either 8 or 24bit
-			my $next = $parts[$count + 1]; # 5 = 8bit, 2 = 24bit
+			$count += 2;
 
-			if ($next == 5) {
-				my $color  = $parts[$count + 2];
-				$count    += 2;
-
-				$ret .= sprintf("[BACKG%03d]",$color);
-			} elsif ($next == 2) {
-				my $red    = $parts[$count + 2];
-				my $green  = $parts[$count + 3];
-				my $blue   = $parts[$count + 4];
-				$count    += 4;
-
-				$ret .= sprintf("[BACKG(%d,%d,%d)]", $red, $green, $blue);
-			} else {
-				$ret .= sprintf("[BACKG???]");
-			}
-		# Basic foreground colors
+			$ret .= sprintf("[BACKG%03d]",$color);
 		} elsif ($p >= 30 and $p <= 37) {
 			my $color = $p - 30;
 			$color = $basic_mapping[$color];
 			$ret .= "[$color]";
-		# Basic background colors
-		} elsif ($p >= 40 and $p <= 47) {
-			my $color = $p - 40;
-			$color = $basic_mapping[$color];
-			$ret .= "[BG-$color]";
-		# Basic bright foreground colors
-		} elsif ($p >= 90 and $p <= 97) {
-			my $color = $p - 90;
-			$color = $basic_mapping[$color];
-			$ret .= "[BRT-$color]";
-		# Basic bright background colors
-		} elsif ($p >= 100 and $p <= 107) {
-			my $color = $p - 100;
-			$color = $basic_mapping[$color];
-			$ret .= "[BRTBG-$color]";
+			#$ret .= sprintf("[BASIC%03d]",$color);
 		} else {
 			$ret .= "[UKN: $p]";
 		}
@@ -150,34 +132,13 @@ sub dump_ansi {
 	return $ret;
 }
 
-# Remove all ANSI codes from a string
-sub bleach_text {
-	my $str = shift();
-	$str    =~ s/\e\[\d*(;\d+)*m//mg;
-
-	return $str;
-}
-
-# Creates methods k() and kd() to print, and print & die respectively
 BEGIN {
-    if (!defined(&trim)) {
-        *trim = sub {
-            my ($s) = (@_, $_); # Passed in var, or default to $_
-            if (length($s) == 0) { return ""; }
-            $s =~ s/^\s*//;
-            $s =~ s/\s*$//;
-
-            return $s;
-        }
-    }
-
-    if (eval { require Dump::Krumo }) {
-        Dump::Krumo->import(qw/k kd/);
-    } else {
-        require Data::Dumper;
-        *k  = sub { print Data::Dumper::Dumper(\@_) };
-        *kd = sub { print Data::Dumper::Dumper(\@_); die; };
-    }
+	if (eval { require Data::Dump::Color }) {
+		*k = sub { Data::Dump::Color::dd($_[0]) };
+	} else {
+		require Data::Dumper;
+		*k = sub { print Data::Dumper::Dumper($_[0]) };
+	}
 }
 
 # vim: tabstop=4 shiftwidth=4 autoindent softtabstop=4

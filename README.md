@@ -1,33 +1,56 @@
-# 🎩 diff-so-fancy  [![Circle CI build](https://circleci.com/gh/so-fancy/diff-so-fancy.svg?style=shield)](https://circleci.com/gh/so-fancy/diff-so-fancy) [![AppVeyor build](https://ci.appveyor.com/api/projects/status/github/so-fancy/diff-so-fancy?branch=master&svg=true)](https://ci.appveyor.com/project/stevemao/diff-so-fancy/branch/master)
+# diff-so-fancy  [![Circle CI build](https://circleci.com/gh/so-fancy/diff-so-fancy.svg?style=shield)](https://circleci.com/gh/so-fancy/diff-so-fancy) [![TravisCI build](https://travis-ci.org/so-fancy/diff-so-fancy.svg?branch=master)](https://travis-ci.org/so-fancy/diff-so-fancy) [![AppVeyor build](https://ci.appveyor.com/api/projects/status/github/so-fancy/diff-so-fancy?branch=master&svg=true)](https://ci.appveyor.com/project/stevemao/diff-so-fancy/branch/master)
 
-`diff-so-fancy` makes your diffs **human** readable instead of machine readable. This helps improve code quality and helps you spot defects faster.
+`diff-so-fancy` strives to make your diffs **human** readable instead of machine readable. This helps improve code quality and helps you spot defects faster.
 
-## 🖼️ Screenshot
+## Screenshot
 
 Vanilla `git diff` vs `git` and `diff-so-fancy`
 
-![diff-highlight vs diff-so-fancy](docs/diff-so-fancy.png)
+![diff-highlight vs diff-so-fancy](diff-so-fancy.png)
 
-## 📦 Install
+## Install
 
-Simply copy the `diff-so-fancy` script from the latest [Github release](https://github.com/so-fancy/diff-so-fancy/releases) into your `$PATH` and you're done. Alternately to test development features you can clone this repo and then put the `diff-so-fancy` script (symlink will work) into your `$PATH`. The `lib/` directory will need to be kept relative to the core script.
+Installation is as simple as cloning this repo and then putting the `diff-so-fancy` script in to your `$PATH`. The `lib/` directory will need to be kept relative to the core script.
 
-`diff-so-fancy` is also available from the [NPM registry](https://www.npmjs.com/package/diff-so-fancy), [brew](https://formulae.brew.sh/formula/diff-so-fancy), [Fedora](https://packages.fedoraproject.org/pkgs/diff-so-fancy/diff-so-fancy/), in the [Arch extra repo](https://archlinux.org/packages/extra/any/diff-so-fancy/), and as [ppa:aos for Debian/Ubuntu Linux](https://github.com/aos/dsf-debian).
+`diff-so-fancy` is also available from the [NPM registry](https://www.npmjs.com/package/diff-so-fancy), [brew](https://formulae.brew.sh/formula/diff-so-fancy), as a package on [Nix](https://github.com/NixOS/nixpkgs/blob/master/pkgs/applications/version-management/git-and-tools/diff-so-fancy/default.nix), in the [Arch community repo](https://archlinux.org/packages/community/any/diff-so-fancy/), as [ppa:aos for Debian/Ubuntu Linux](https://github.com/aos/dsf-debian), and as [Fedora COPR repository](https://copr.fedorainfracloud.org/coprs/kopfkrieg/diff-so-fancy/).
 
-Issues relating to packaging ("installation does not work", "version is out of date", etc.) should be directed to those packages' repositories/issue trackers where applicable.
+Issues relating to packaging ('installation does not work', 'version is out of date', etc.) should be directed to those packages' own repositories/issue trackers where applicable.
 
-## ✨ Usage
+**Note:** Windows users may need to install [MinGW](https://sourceforge.net/projects/mingw/files/) or the [Windows subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/install-win10).
 
-### Git
+## Usage
+
+### With git
 
 Configure git to use `diff-so-fancy` for all diff output:
 
 ```shell
-git config --global core.pager "diff-so-fancy | less --tabs=4 -RF"
+git config --global core.pager "diff-so-fancy | less --tabs=4 -RFX"
 git config --global interactive.diffFilter "diff-so-fancy --patch"
 ```
 
-### Diff
+### Improved colors for the highlighted bits
+
+The default Git colors are not optimal. The colors used for the screenshot above were:
+
+```shell
+git config --global color.ui true
+
+git config --global color.diff-highlight.oldNormal    "red bold"
+git config --global color.diff-highlight.oldHighlight "red bold 52"
+git config --global color.diff-highlight.newNormal    "green bold"
+git config --global color.diff-highlight.newHighlight "green bold 22"
+
+git config --global color.diff.meta       "11"
+git config --global color.diff.frag       "magenta bold"
+git config --global color.diff.func       "146 bold"
+git config --global color.diff.commit     "yellow bold"
+git config --global color.diff.old        "red bold"
+git config --global color.diff.new        "green bold"
+git config --global color.diff.whitespace "red reverse"
+```
+
+### With diff
 
 Use `-u` with `diff` for unified output, and pipe the output to `diff-so-fancy`:
 
@@ -35,17 +58,20 @@ Use `-u` with `diff` for unified output, and pipe the output to `diff-so-fancy`:
 diff -u file_a file_b | diff-so-fancy
 ```
 
-We also support recursive mode with `-r` or `--recursive`
+It also supports the recursive mode of diff with `-r` or `--recursive` as **first argument**
 
 ```shell
-diff --recursive -u /path/folder_a /path/folder_b | diff-so-fancy
+diff -r -u folder_a folder_b | diff-so-fancy
 ```
 
-## ⚒️ Options
+```shell
+diff --recursive -u folder_a folder_b | diff-so-fancy
+```
+## Options
 
 ### markEmptyLines
 
-Colorize the first block of an empty line. (Default: true)
+Should the first block of an empty line be colored. (Default: true)
 
 ```shell
 git config --bool --global diff-so-fancy.markEmptyLines false
@@ -53,7 +79,7 @@ git config --bool --global diff-so-fancy.markEmptyLines false
 
 ### changeHunkIndicators
 
-Simplify Git header chunks to a human readable format. (Default: true)
+Simplify git header chunks to a more human readable format. (Default: true)
 
 ```shell
 git config --bool --global diff-so-fancy.changeHunkIndicators false
@@ -61,7 +87,7 @@ git config --bool --global diff-so-fancy.changeHunkIndicators false
 
 ### stripLeadingSymbols
 
-Remove the `+` or `-` symbols at start of each diff line. (Default: true)
+Should the pesky `+` or `-` at line-start be removed. (Default: true)
 
 ```shell
 git config --bool --global diff-so-fancy.stripLeadingSymbols false
@@ -69,8 +95,7 @@ git config --bool --global diff-so-fancy.stripLeadingSymbols false
 
 ### useUnicodeRuler
 
-Use Unicode to draw the ruler lines. Setting this to false will use ASCII
-instead. (Default: true)
+By default, the separator for the file header uses Unicode line-drawing characters. If this is causing output errors on your terminal, set this to `false` to use ASCII characters instead. (Default: true)
 
 ```shell
 git config --bool --global diff-so-fancy.useUnicodeRuler false
@@ -78,22 +103,13 @@ git config --bool --global diff-so-fancy.useUnicodeRuler false
 
 ### rulerWidth
 
-rulerWidth sets the width of the ruler lines. (Default: screen width)
+By default, the separator for the file header spans the full width of the terminal. Use this setting to set the width of the file header manually.
 
 ```shell
-git config --global diff-so-fancy.rulerWidth 80
+git config --global diff-so-fancy.rulerWidth 47    # git log's commit header width
 ```
 
-### shortHeaders
-
-Simplify the header inforation to a *single* line for filename and line
-number. (Default false)
-
-```shell
-git config --global diff-so-fancy.shortHeaders true
-```
-
-## 👨 The diff-so-fancy team
+## The diff-so-fancy team
 
 | Person                | Role             |
 | --------------------- | ---------------- |
@@ -103,25 +119,21 @@ git config --global diff-so-fancy.shortHeaders true
 | @AOS                  | Debian packager  |
 | @Stevemao/@Paul Irish | NPM release team |
 
-## 🧬 Contributing
+## Contributing
 
-Pull requests are quite welcome, and should target the
-[`next` branch](https://github.com/so-fancy/diff-so-fancy/tree/next). We are also
-looking for any feedback or ideas on how to make `diff-so-fancy` even *fancier*.
+Pull requests are quite welcome, and should target the [`next` branch](https://github.com/so-fancy/diff-so-fancy/tree/next). We are also looking for any feedback or ideas on how to make `diff-so-fancy` even *fancier*.
 
 ### Other documentation
 
-* [Pro-tips for advanced users](docs/pro-tips.md)
-* [Reporting Bugs](docs/reporting-bugs.md)
-* [Hacking and Testing](docs/hacking-and-testing.md)
-* [History](docs/history.md)
+* [Pro-tips on advanced usage](pro-tips.md)
+* [Reporting Bugs](reporting-bugs.md)
+* [Hacking and Testing](hacking-and-testing.md)
+* [History](history.md)
 
-## 🔃 Alternatives
+## Alternatives
 
-* [Delta](https://github.com/dandavison/delta)
-* [Lazygit](https://github.com/jesseduffield/lazygit) with diff-so-fancy [integration](https://github.com/jesseduffield/lazygit/blob/master/docs/Custom_Pagers.md#diff-so-fancy)
-* [difftastic](https://github.com/Wilfred/difftastic)
+* https://github.com/dandavison/delta
 
-## 🏛️ License
+## License
 
 MIT

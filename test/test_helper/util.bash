@@ -1,6 +1,5 @@
 
 diff_so_fancy="$BATS_TEST_DIRNAME/../diff-so-fancy"
-ansi_reveal="$BATS_TEST_DIRNAME/../third_party/ansi-reveal/ansi-reveal.pl --plain"
 
 load_fixture() {
   local name="$1"
